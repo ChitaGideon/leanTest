@@ -1,9 +1,9 @@
 (function(){
   'use strict';
-  var time, request, map, checkIsNotNull, thenHandle, slice$ = [].slice;
+  var time, request, ref$, map, reject, filter, checkIsNotNull, checkBody, thenHandle, slice$ = [].slice;
   time = 0;
   request = AV._request;
-  map = require('prelude-ls').map;
+  ref$ = require('prelude-ls'), map = ref$.map, reject = ref$.reject, filter = ref$.filter;
   checkIsNotNull = function(obj){
     var args, i$, len$, name;
     args = slice$.call(arguments, 1);
@@ -15,6 +15,12 @@
       }
     }
     return null;
+  };
+  checkBody = function(x){
+    var arg;
+    arg = slice$.call(arguments, 1);
+    arguments[0] = arguments[0].body;
+    return checkIsNotNull.apply(this, arguments);
   };
   thenHandle = function(res){
     return function(){
@@ -96,17 +102,28 @@
       return request('classes', 'usingTime', null, 'POST', data).then(thenHandle(res));
     });
     router.get('/paintOp', function(req, res){
+      var data, result;
+      data = req.query.data;
+      data = JSON.parse(data);
+      result = reject(partialize$.apply(this, [checkBody, [void 8, 'currentUser', 'paint'], [0]]))(
+      data);
+      console.log("result", result);
+      return request('batch', null, null, 'POST', {
+        requests: result
+      }).then(thenHandle(res));
+    });
+    router.get('/paintCreate', function(req, res){
       var data, r;
       data = req.query.data;
       data = JSON.parse(data);
-      r = checkIsNotNull(data, 'currentUser', 'pid');
+      r = checkIsNotNull(data, 'currentUser', 'paint');
       if (r) {
         return res.json({
           times: time,
           results: r
         });
       }
-      return request('classes', 'usingTime', null, 'POST', data).then(thenHandle(res));
+      return request('classes', 'paintNew', null, 'POST', data).then(thenHandle(res));
     });
     router.get('/event', function(req, res){
       var r;
@@ -147,4 +164,15 @@
       });
     });
   };
+  function partialize$(f, args, where){
+    var context = this;
+    return function(){
+      var params = slice$.call(arguments), i,
+          len = params.length, wlen = where.length,
+          ta = args ? args.concat() : [], tw = where ? where.concat() : [];
+      for(i = 0; i < len; ++i) { ta[tw[0]] = params[i]; tw.shift(); }
+      return len < wlen && len ?
+        partialize$.apply(context, [f, ta, tw]) : f.apply(context, ta);
+    };
+  }
 }).call(this);

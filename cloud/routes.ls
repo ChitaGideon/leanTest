@@ -1,7 +1,7 @@
 'use strict'
 time = 0;
 request = AV._request;
-{map} = require('prelude-ls')
+{map,reject,filter} = require('prelude-ls')
 checkIsNotNull = (obj,...args)->
   for name in args
     console.log "check",name,obj,obj?[name]
@@ -9,6 +9,9 @@ checkIsNotNull = (obj,...args)->
       return name
   return null
 
+checkBody = (x,...arg)->
+  arguments[0]=arguments[0].body
+  checkIsNotNull.apply(this,arguments)
 
 thenHandle =  (res)->
   -> res.json times:time++ ,results: arguments[0]
@@ -57,9 +60,22 @@ module.exports = (router) ->
   router.get '/paintOp',(req,res)->
     data = req.query.data
     data = JSON.parse data
-    r = checkIsNotNull data, \currentUser,\pid
+    result = data
+    |> reject checkBody _,\currentUser,\paint
+    #|> each (.metho)
+    #r = checkIsNotNull data, \currentUser
+    #return res.json times:time,results:r if r
+    console.log "result",result
+    request 'batch', null,null,'POST',requests:result .then thenHandle res
+    #res.json status:true,results:requests:result
+
+  router.get '/paintCreate',(req,res)->
+    data = req.query.data
+    data = JSON.parse data
+    r = checkIsNotNull data, \currentUser,\paint
     return res.json times:time,results:r if r
-    request 'classes', 'usingTime',null,'POST',data .then thenHandle res
+    request 'classes', 'paintNew',null,'POST',data .then thenHandle res
+
 
   router.get '/event',(req,res)->
     r = checkIsNotNull data, \currentUser
