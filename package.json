@@ -5,7 +5,6 @@
   "private": true,
   "dependencies": {
     "async": "0.9.x",
-    "Livescript": "1.3.1",
     "prelude-ls":"1.1.1",
     "request": "~2.37.0"
   },

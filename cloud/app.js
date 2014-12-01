@@ -1,6 +1,6 @@
 var express, app, request,server;
-require('Livescript');
-require('coffee-script/register');
+//require('Livescript');
+//require('coffee-script/register');
 express = require('express');
 app = express();
 routes = require('cloud/routes.js');
