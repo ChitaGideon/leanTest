@@ -15,7 +15,22 @@ checkBody = (x,...arg)->
 
 thenHandle =  (res)->
   -> res.json times:time++ ,results: arguments[0]
-
+#ajax = AV._ajax
+#AV._request = ->
+  #console.log "ajax",arguments
+  ##ajax.apply null,arguments
+#GameScore = AV.Object.extend("userBase");
+#query = new AV.Query(GameScore);
+#query.equalTo("level1", "superPage");
+#query.find({
+  #success: (results)->
+    ##alert("Successfully retrieved " + results.length + " scores.");
+    #for (i = 0; i < results.length; i++) 
+      #object = results[i];
+    #console.log "success",results
+  #error: (error)->
+    #console.log("Error: " + error.code + " " + error.message);
+#});
 module.exports = (router) -> 
   #router.route(/.*/).all (req, res) -> 
     #res.send AV._request
@@ -76,6 +91,14 @@ module.exports = (router) ->
     return res.json times:time,results:r if r
     request 'classes', 'paintNew',null,'POST',data .then thenHandle res
 
+  router.get '/queryAll/:classes/:tableName',(req,res)->
+    {classes,tableName}=req.params
+    {oid,method,dataObject} = req.query
+    classes||='classes'
+    method||='GET'
+    #console.log('queryAll',classes,tableName,oid,method,dataObject)
+    request classes,tableName,oid,method,JSON.parse dataObject .then thenHandle res
+    #AV._ajax(request classes,tabelName,oid,method,JSON.stringify dataObject .then thenHandle res
 
   router.get '/event',(req,res)->
     r = checkIsNotNull data, \currentUser
@@ -83,6 +106,7 @@ module.exports = (router) ->
     request('classes','testObj',null,"POST",req.query).then ->
       console.log "/event?",arguments
       res.json arguments[0]
+
 
   router.get '/batch',(req,res)->
     b =

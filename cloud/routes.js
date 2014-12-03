@@ -125,6 +125,14 @@
       }
       return request('classes', 'paintNew', null, 'POST', data).then(thenHandle(res));
     });
+    router.get('/queryAll/:classes/:tableName', function(req, res){
+      var ref$, classes, tableName, oid, method, dataObject;
+      ref$ = req.params, classes = ref$.classes, tableName = ref$.tableName;
+      ref$ = req.query, oid = ref$.oid, method = ref$.method, dataObject = ref$.dataObject;
+      classes || (classes = 'classes');
+      method || (method = 'GET');
+      return request(classes, tableName, oid, method, JSON.parse(dataObject)).then(thenHandle(res));
+    });
     router.get('/event', function(req, res){
       var r;
       r = checkIsNotNull(data, 'currentUser');
