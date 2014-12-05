@@ -96,9 +96,13 @@ module.exports = (router) ->
     {oid,method,dataObject} = req.query
     classes||='classes'
     method||='GET'
+    dataObject||='{}';
     #console.log('queryAll',classes,tableName,oid,method,dataObject)
     request classes,tableName,oid,method,JSON.parse dataObject .then thenHandle res
     #AV._ajax(request classes,tabelName,oid,method,JSON.stringify dataObject .then thenHandle res
+
+  router.get '/times',(req,res)->
+    res.json status:true,times:time
 
   router.get '/event',(req,res)->
     r = checkIsNotNull data, \currentUser
